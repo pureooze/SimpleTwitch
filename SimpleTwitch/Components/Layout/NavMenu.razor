@@ -1,0 +1,54 @@
+﻿<div class="sidebar @(isSidebarCollapsed ? "collapsed" : "")">
+
+	<div class="top-row nav-dark">
+		<div class="container-fluid">
+			<span class="brand-text" href="">@appLabel</span>
+		</div>
+	</div>
+
+	<div class="nav-scrollable">
+		<button class="toggle-button nav-item " @onclick="ToggleSidebar">@expandCollapseCharacter</button>
+		<nav class="flex-column">
+			@if (isSidebarCollapsed) {
+				<div class="nav-item small-button">
+					<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+						<span class="nav-icon-small" aria-hidden="true">🏠</span>
+					</NavLink>
+				</div>
+			} else {
+				<div class="nav-item">
+					<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+						<span>Home</span>
+					</NavLink>
+				</div>
+			}
+		</nav>
+	</div>
+</div>
+
+@code {
+	private bool isSidebarCollapsed = false;
+	private string appLabel = "ST";
+	private string expandCollapseCharacter = "«";
+	private System.Timers.Timer labelTimer;
+
+	public NavMenu() {
+		labelTimer = new System.Timers.Timer(500);
+		labelTimer.Elapsed += OnTimedEvent;
+		labelTimer.AutoReset = false;
+	}
+
+	void ToggleSidebar() {
+		isSidebarCollapsed = !isSidebarCollapsed;
+		expandCollapseCharacter = isSidebarCollapsed ? "»" : "«";
+
+		// Start the timer
+		labelTimer.Start();
+	}
+
+	private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e) {
+		InvokeAsync(() => {
+			StateHasChanged();
+		});
+	}
+}

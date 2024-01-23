@@ -1,0 +1,35 @@
+﻿@using SimpleTwitch.Services
+@inherits LayoutComponentBase
+@inject EventService eventService
+
+<div class="page">
+
+    <NavMenu/>
+
+    <main>
+        <div class="top-row px-4">
+            <div class="input-container">
+				<input class="user-input" @bind="inputValue" @onkeyup="CheckEnterKey" />
+            </div>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+
+    private string inputValue;
+
+    private void CheckEnterKey(
+        KeyboardEventArgs e
+    ) {
+        
+		if( e.Code == "Enter" ) {
+            eventService.HandleChangeUser( inputValue );
+        }
+    }
+
+}
