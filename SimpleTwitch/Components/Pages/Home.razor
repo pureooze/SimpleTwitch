@@ -1,14 +1,12 @@
 ﻿@inject IConfiguration Configuration
-@inject ITwitchService twitchService
-@inject EventService eventService
+@inject ITwitchService TwitchService
+@inject EventService EventService
 
 @page "/"
 @using Microsoft.Extensions.Configuration
 @using SimpleTwitch.Components.Layout
 @using TwitchEverywhere.Core.Types.Messages.Implementation
 @using TwitchEverywhere.Core.Types.Messages.Interfaces
-@using System.Text.Json
-@using System.Text.Json.Serialization
 @using SimpleTwitch.Services
 @using TwitchEverywhere.Core.Types
 
@@ -27,7 +25,7 @@
 				</div>
 			</div>
 			<div class="chat-input-container">
-				<textarea class="chat-input" type="text" placeholder="Send a message" />
+				<textarea class="chat-input" type="text" placeholder="Send a message"></textarea>
 				<button class="chat-send-button">Send</button>
 			</div>
 		</div>
@@ -37,36 +35,16 @@
 
 @code {
     private readonly Queue<IPrivMsg> m_messages = new();
-    private Dictionary<string, GameInfo> m_globalBadges;
-    private readonly JsonSerializerOptions m_options;
     private int m_batchSize = 100;
-    private string m_valueFromInputBox = "hi";
+    private string m_valueFromInputBox = "cohh";
     private ITwitchService m_service;
-    private readonly bool userScrolledUp = false;
-
-    public Home() {
-        m_globalBadges = new Dictionary<string, GameInfo>();
-
-        m_options = new JsonSerializerOptions {
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-            PropertyNameCaseInsensitive = true
-        };
-    }
 
     protected override async Task OnInitializedAsync() {
         m_batchSize = Configuration.GetValue<int>( "Settings:BufferSize" );
-        m_service = twitchService;
+        m_service = TwitchService;
 
-        eventService.OnEnterPressed += HandleEnterPressed;
-
-        var assembly = GetType().Assembly;
-        var resourceName = "SimpleTwitch.Resources.Json.global-badges.json";
-        using var stream = assembly.GetManifestResourceStream( resourceName );
-        using var reader = new StreamReader( stream );
-        var json = await reader.ReadToEndAsync();
-        m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>( json, m_options );
-
-        await m_service.ConnectToIrcChannel( channel: "cohh", MessageCallback );
+        EventService.OnEnterPressed += HandleEnterPressed;
+        await m_service.ConnectToIrcChannel( channel: m_valueFromInputBox, MessageCallback );
     }
 
     private void MessageCallback(
@@ -95,27 +73,4 @@
 
         StateHasChanged();
     }
-
-    public class Version {
-        [JsonPropertyName( "id" )] public string Id { get; set; }
-
-        [JsonPropertyName( "image_url_1x" )] public string ImageUrl1x { get; set; }
-
-        [JsonPropertyName( "image_url_2x" )] public string ImageUrl2x { get; set; }
-
-        [JsonPropertyName( "image_url_4x" )] public string ImageUrl4x { get; set; }
-
-        [JsonPropertyName( "title" )] public string Title { get; set; }
-
-        [JsonPropertyName( "description" )] public string Description { get; set; }
-
-        [JsonPropertyName( "click_action" )] public string ClickAction { get; set; }
-
-        [JsonPropertyName( "click_url" )] public string ClickUrl { get; set; }
-    }
-
-    public class GameInfo {
-        [JsonPropertyName( "versions" )] public List<Version> Versions { get; set; }
-    }
-
 }
