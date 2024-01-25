@@ -13,10 +13,7 @@ main {
     display: flex;
     flex-direction: row;
     column-gap: 10.5rem;
-    margin-bottom: 1rem;
-}
-
-.user-input {
+    margin: 1rem;
 }
 
 .top-row {

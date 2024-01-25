@@ -4,6 +4,7 @@
     column-gap: 0.15em;
     position: relative;
     background-color: var(--secondary-color);
+    height: 100%;
 }
 
 .video {
@@ -14,52 +15,48 @@
     border: 1px solid black;
 }
 
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    border: 1px solid black;
+    max-height: 80vh;
+    overflow: hidden;
+    max-width: 25vw;
+}
+
 .chat {
     text-align: left;
     line-height: 1.1;
+    display: flex;
+    flex-direction: column-reverse;
+    flex-grow: 1;
+    overflow-y: auto;
 }
 
 .chat-wrapper {
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     height: 100%;
-    width: 25%;
-    overflow-y: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 75%;
 }
 
-.chat-message {
-    padding: 0.5em 0em 0.5em 0.2em;
-    /*padding-left: 0.2em;
-    padding-bottom: 0.1em;*/
+.chat-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    row-gap: 0.5em;
+    padding: 0.5em;
+    background-color: var(--primary-color);
 }
 
-.chat-message:nth-child(even) {
-    background-color: var(--chat-light-bg);
-}
-
-.chat-message:nth-child(odd) {
-    background-color: var(--chat-dark-bg);
-}
-
-.username {
+.chat-send-button {
+    background-color: var(--prpl-accent-color);
+    border: none;
+    border-radius: 0.25em;
+    width: 5em;
+    color: var(--font-color);
+    padding: 0.5em;
     font-weight: bold;
-    font-size: medium;
-    color: var(--font-color);
-}
-
-.message {
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    font-size: medium;
-    color: var(--font-color);
-}
-
-.twitch-badge {
-    font-size: small;
-    height: 18px;
-    padding-right: 0.2em;
+    align-self: flex-end;
+    margin-right: 0.5em;
 }

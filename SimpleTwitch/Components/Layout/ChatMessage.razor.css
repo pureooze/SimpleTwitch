@@ -1,0 +1,30 @@
+﻿.chat-message {
+    padding: 0.5em 0em 0.5em 0.2em;
+}
+
+.chat-message:nth-child(even) {
+    background-color: var(--chat-light-bg);
+}
+
+.chat-message:nth-child(odd) {
+    background-color: var(--chat-dark-bg);
+}
+
+.username {
+    font-weight: bold;
+    font-size: medium;
+    color: var(--font-color);
+}
+
+.message {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    font-size: medium;
+    color: var(--font-color);
+}
+
+.twitch-badge {
+    font-size: small;
+    height: 18px;
+    padding-right: 0.2em;
+}

@@ -1,0 +1,65 @@
+﻿@using TwitchEverywhere.Core.Types.Messages.Interfaces
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using TwitchEverywhere.Core.Types
+@using System.Reflection
+
+<div class="chat-message">
+	<span class="username">
+		@foreach (Badge badge in Message.Badges) {
+			@if (m_globalBadges != null && m_globalBadges.TryGetValue(badge.Name, value: out GameInfo? badgeInfo)) {
+				<img alt="" class="twitch-badge" src="@badgeInfo.Versions[0].ImageUrl1x" />
+			}
+		}
+		<span style="color: @Message.Color">@Message.DisplayName:</span>
+	</span>
+	<span class="message">
+		@Message.Text
+	</span>
+</div>
+
+@code {
+
+	[Parameter]
+	public IPrivMsg Message { get; set; }
+
+	private Dictionary<string, GameInfo> m_globalBadges = new();
+    
+    private JsonSerializerOptions m_options = new() {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
+    };
+    
+	protected override async Task OnInitializedAsync() {
+		Assembly assembly = GetType().Assembly;
+		const string resourceName = "SimpleTwitch.Resources.Json.global-badges.json";
+        await using Stream? stream = assembly.GetManifestResourceStream(resourceName);
+		using StreamReader reader = new(stream);
+		string json = await reader.ReadToEndAsync();
+		m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options);
+
+	}
+
+	public class Version {
+        [JsonPropertyName( "id" )] public string Id { get; set; }
+
+        [JsonPropertyName( "image_url_1x" )] public string ImageUrl1x { get; set; }
+
+        [JsonPropertyName( "image_url_2x" )] public string ImageUrl2x { get; set; }
+
+        [JsonPropertyName( "image_url_4x" )] public string ImageUrl4x { get; set; }
+
+        [JsonPropertyName( "title" )] public string Title { get; set; }
+
+        [JsonPropertyName( "description" )] public string Description { get; set; }
+
+        [JsonPropertyName( "click_action" )] public string ClickAction { get; set; }
+
+        [JsonPropertyName( "click_url" )] public string ClickUrl { get; set; }
+    }
+
+	public class GameInfo {
+		[JsonPropertyName("versions")] public List<Version> Versions { get; set; }
+	}
+
+}
