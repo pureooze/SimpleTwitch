@@ -9,7 +9,7 @@
     <main>
         <div class="top-row px-4">
             <div class="input-container">
-				<input class="user-input" @bind="inputValue" @onkeyup="CheckEnterKey" />
+				<input class="user-input" @bind="inputValue" @bind:event="oninput" @onkeyup="CheckEnterKey" />
             </div>
         </div>
 
@@ -27,7 +27,7 @@
         KeyboardEventArgs e
     ) {
         
-		if( e.Code == "Enter" ) {
+		if( e.Code == "Enter" || e.Key == "Enter" ) {
             eventService.HandleChangeUser( inputValue );
         }
     }

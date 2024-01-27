@@ -1,4 +1,5 @@
 ﻿using TwitchEverywhere.Core.Types;
+using TwitchEverywhere.Core.Types.RestApi.Wrappers;
 
 namespace SimpleTwitch.Services;
 
@@ -10,4 +11,8 @@ public interface ITwitchService {
     );
 
     Task DisconnectFromIrcChannel();
+    
+    Task<GetUsersResponse> GetUsers( 
+        string username
+    );
 }
