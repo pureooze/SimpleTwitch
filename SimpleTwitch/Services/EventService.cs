@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimpleTwitch.Services {
+﻿namespace SimpleTwitch.Services {
     internal class EventService {
-        public event Action<string> OnEnterPressed;
+        public event EventHandler<string> OnEnterPressed;
+        private string name = "";
         
         public void HandleChangeUser(
             string user
         ) {
-            OnEnterPressed?.Invoke(user);
+            name = user;
+            OnEnterPressed?.Invoke(this, name);
         }
     }
 }
