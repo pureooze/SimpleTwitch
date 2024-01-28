@@ -41,6 +41,13 @@ public class TwitchService : ITwitchService {
         InitializeRestClient();
         return m_restClient.GetUsersByLogin( [username] );
     }
+    
+    Task<GetChannelInfoResponse> ITwitchService.GetChannelInfo(
+        string broadcasterId
+    ) {
+        InitializeRestClient();
+        return m_restClient.GetChannelInfo( broadcasterId );
+    }
 
     private void InitializeIrcClient( string channel ) {
         TwitchConnectionOptions options = new(
