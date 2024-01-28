@@ -20,7 +20,6 @@ namespace SimpleTwitch {
             builder.Configuration.AddJsonFile( "appsettings.json", true, true );
             builder.Configuration.AddJsonFile( "twitch.json", true, true );
 
-            builder.Services.AddSingleton<EventService>();
             builder.Services.AddSingleton<ITwitchService , TwitchService>();
 
 #if DEBUG

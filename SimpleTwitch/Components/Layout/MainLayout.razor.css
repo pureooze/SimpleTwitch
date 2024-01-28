@@ -9,13 +9,6 @@ main {
     flex: 1;
 }
 
-.input-container {
-    display: flex;
-    flex-direction: row;
-    column-gap: 10.5rem;
-    margin: 1rem;
-}
-
 .top-row {
     background-color: var(--primary-color);
     border-bottom: 1px solid var(--accent-color);

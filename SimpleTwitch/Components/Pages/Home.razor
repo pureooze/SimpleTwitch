@@ -1,6 +1,5 @@
 ﻿@inject IConfiguration Configuration
 @inject ITwitchService TwitchService
-@inject EventService EventService
 
 @page "/"
 @using Microsoft.Extensions.Configuration
@@ -13,7 +12,12 @@
 @using System.Net
 
 <div>
-    <h1>@m_displayName</h1>
+    <div class="header">
+        <h1>@m_displayName</h1>
+        <div class="input-container">
+        	<input class="user-input" @bind="m_input" @bind:event="oninput" @onkeyup="HandleEnterPressed" />
+        </div>
+    </div>
     <div class="stream-page-content">
         <div class="video">
         </div>
@@ -39,13 +43,13 @@
     private readonly Queue<IPrivMsg> m_messages = new();
     private int m_batchSize = 100;
     private ITwitchService m_service;
+    private string m_input = "Cohh";
     private string m_displayName = "Cohh";
 
     protected override async Task OnInitializedAsync() {
         m_batchSize = Configuration.GetValue<int>( "Settings:BufferSize" );
         m_service = TwitchService;
 
-        EventService.OnEnterPressed += async (sender, args) => await HandleEnterPressed(args);
         await m_service.ConnectToIrcChannel( channel: m_displayName.ToLower(), MessageCallback );
     }
 
@@ -64,17 +68,21 @@
         }
 
     }
+    
+    private async Task HandleEnterPressed(KeyboardEventArgs e) {
+        if(e.Code == "Enter" || e.Key == "Enter") {
+            await HandleChannelChange();
+        }
+    }
 
-    private async Task HandleEnterPressed(
-        string value
-    ) {
+    private async Task HandleChannelChange() {
         m_messages.Clear();
 
-        GetUsersResponse response = await m_service.GetUsers( value );
+        GetUsersResponse response = await m_service.GetUsers( m_input.ToLower() );
         if( response.StatusCode == HttpStatusCode.OK ) {
             m_displayName = response.ApiResponse.Data[0].DisplayName;
             await m_service.DisconnectFromIrcChannel();
-            await m_service.ConnectToIrcChannel( value, MessageCallback );
+            await m_service.ConnectToIrcChannel( m_input, MessageCallback );
         }
 
         StateHasChanged();
