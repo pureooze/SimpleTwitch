@@ -24,7 +24,27 @@
     height: 3em;
     border-radius: 50%;
     margin-right: 0.5em;
-    outline: var(--prpl-accent-color) solid 0.2em;
+    outline: var(--prpl-accent-color) solid 2px;
+}
+
+.tag {
+    font-size: 0.8em;
+    padding: 0.2em 0.5em;
+    background-color: var(--secondary-color);
+    border-radius: 0.25em;
+    border: var(--dark-accent-color) 1px solid;
+}
+
+.tag-container {
+    display: flex;
+    flex-direction: row;
+    column-gap: 0.5em;
+}
+
+.channel-info-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.1em;
 }
 
 .input-container {

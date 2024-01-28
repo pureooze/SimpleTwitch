@@ -15,4 +15,8 @@ public interface ITwitchService {
     Task<GetUsersResponse> GetUsers( 
         string username
     );
+    
+    Task<GetChannelInfoResponse> GetChannelInfo( 
+        string broadcasterId
+    );
 }
