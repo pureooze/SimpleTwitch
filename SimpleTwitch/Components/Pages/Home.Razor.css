@@ -8,6 +8,25 @@
     color: var(--font-color);
 }
 
+.header-title-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    column-gap: 0.5em;
+}
+
+.header-title-container > * {
+    margin: auto;
+}
+
+.profile-image {
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+    margin-right: 0.5em;
+    outline: var(--prpl-accent-color) solid 0.2em;
+}
+
 .input-container {
     display: flex;
     flex-direction: row;
