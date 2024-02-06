@@ -9,6 +9,10 @@ main {
     flex: 1;
 }
 
+article {
+    height: 100%;
+}
+
 .top-row {
     background-color: var(--primary-color);
     border-bottom: 1px solid var(--accent-color);
