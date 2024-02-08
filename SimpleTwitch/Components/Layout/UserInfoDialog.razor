@@ -1,0 +1,46 @@
+﻿@using TwitchEverywhere.Core.Types.Messages.Interfaces
+@using TwitchEverywhere.Core.Types
+@using SimpleTwitch.Data
+@using System.Reflection
+@using System.Text.Json
+
+<div class="user-info-dialog">
+    <div class="user-info-dialog-header">
+        <h2>@Message.DisplayName</h2>
+        <button class="user-info-dialog-close-button" @onclick="OnClose">X</button>
+    </div>
+    <div class="badge-container">
+        <h5>BADGES</h5>
+        <div class="badge-list">
+            @foreach (Badge badge in Message.Badges) {
+                @if( m_globalBadges != null && m_globalBadges.TryGetValue( badge.Name, value: out GameInfo? badgeInfo ) ) {
+                    <img title="@badgeInfo.Versions[0].Description" alt="@badgeInfo.Versions[0].Description" class="twitch-badge" src="@badgeInfo.Versions[0].ImageUrl2x"/>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IPrivMsg Message { get; set; }
+    
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+    
+    private Dictionary<string, GameInfo> m_globalBadges = new();
+
+    private JsonSerializerOptions m_options = new() {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
+    };
+    
+    protected override async Task OnInitializedAsync() {
+        Assembly assembly = GetType().Assembly;
+        const string resourceName = "SimpleTwitch.Resources.Json.global-badges.json";
+        await using Stream? stream = assembly.GetManifestResourceStream(resourceName);
+        using StreamReader reader = new(stream);
+        string json = await reader.ReadToEndAsync();
+        m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options);
+    }
+}

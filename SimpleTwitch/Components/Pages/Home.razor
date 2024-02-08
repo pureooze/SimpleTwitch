@@ -39,8 +39,8 @@
             <div class="chat-container">
                 <div class="chat">
                     <div class="chat-wrapper">
-                        @foreach (IPrivMsg message in m_messages.Reverse()) {
-                            <ChatMessage Message="@message"></ChatMessage>
+                        @foreach (IPrivMsg message in m_messages) {
+                            <ChatMessage OnChildActionWithData="ParentMethodWithData" Message="@message" @key="@message.Id"></ChatMessage>
                         }
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                 <div class="chat">
                     <div class="chat-wrapper">
                         @foreach (IPrivMsg message in m_messages.Reverse()) {
-                            <ChatMessage Message="@message"></ChatMessage>
+                            <ChatMessage Message="@message" OnChildActionWithData="ParentMethodWithData"></ChatMessage>
                         }
                     </div>
                 </div>
@@ -86,6 +86,9 @@
                     <textarea class="chat-input" type="text" placeholder="Send a message"></textarea>
                     <button class="chat-send-button">Send</button>
                 </div>
+                @if( m_userInfoDialogVisible ) {
+                    <UserInfoDialog OnClose="CloseUserInfoDialog" Message="@m_userInfoTarget"></UserInfoDialog>
+                }
             </div>
 
         </div>
@@ -95,17 +98,21 @@
 
 @code {
     private readonly Queue<IPrivMsg> m_messages = new();
-    private bool m_isLoading = false;
+    private bool m_isLoading;
     private int m_batchSize = 100;
     private ITwitchService m_service;
     private string m_input = "";
     private string m_displayName = "";
     private string m_profileImageUrl = "";
     private List<string> m_tags = [];
-
+    
+    private bool m_userInfoDialogVisible;
+    private IPrivMsg m_userInfoTarget;
+    
     protected override async Task OnInitializedAsync() {
         m_batchSize = Configuration.GetValue<int>( "Settings:BufferSize" );
         m_service = TwitchService;
+        m_userInfoDialogVisible = false;
 
         await m_service.ConnectToIrcChannel( channel: m_displayName.ToLower(), MessageCallback );
     }
@@ -132,6 +139,15 @@
         }
     }
 
+    private void ParentMethodWithData(IPrivMsg message) {
+        m_userInfoDialogVisible = true;
+        m_userInfoTarget = message;
+    }
+    
+    private void CloseUserInfoDialog() {
+        m_userInfoDialogVisible = false;
+    }
+    
     private async Task HandleChannelChange() {
         m_isLoading = true;
         m_messages.Clear();

@@ -9,10 +9,10 @@
 	<span class="username">
 		@foreach (Badge badge in Message.Badges) {
 			@if (m_globalBadges != null && m_globalBadges.TryGetValue(badge.Name, value: out GameInfo? badgeInfo)) {
-				<img alt="" class="twitch-badge" src="@badgeInfo.Versions[0].ImageUrl1x" />
+				<img title="@badgeInfo.Versions[0].Description" alt="@badgeInfo.Versions[0].Description" class="twitch-badge" src="@badgeInfo.Versions[0].ImageUrl1x" />
 			}
 		}
-		<span style="color: @Message.Color">@Message.DisplayName:</span>
+        <a @onclick="() => HandleUsernameClick(Message)" style="color: @Message.Color">@Message.DisplayName:</a>
 	</span>
 	<span class="message">
 		@Message.Text
@@ -23,7 +23,10 @@
 
 	[Parameter]
 	public IPrivMsg Message { get; set; }
-
+    
+    [Parameter]
+    public EventCallback<IPrivMsg> OnChildActionWithData { get; set; }
+    
 	private Dictionary<string, GameInfo> m_globalBadges = new();
     
     private JsonSerializerOptions m_options = new() {
@@ -40,4 +43,11 @@
 		m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options);
 
 	}
+    
+    private async Task HandleUsernameClick(IPrivMsg message) {
+        Console.WriteLine("Username clicked ");
+        if( OnChildActionWithData.HasDelegate ) {
+            await OnChildActionWithData.InvokeAsync( message );
+        }
+    }
 }

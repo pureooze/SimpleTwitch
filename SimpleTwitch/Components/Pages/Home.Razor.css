@@ -141,11 +141,12 @@
 }
 
 .chat-container {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 25%;
     border: 1px solid black;
-    max-height: 80vh;
+    height: 80vh;
     overflow: hidden;
     max-width: 25vw;
 }
