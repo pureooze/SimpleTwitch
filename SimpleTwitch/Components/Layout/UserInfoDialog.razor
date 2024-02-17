@@ -1,25 +1,49 @@
-﻿@using TwitchEverywhere.Core.Types.Messages.Interfaces
+﻿@inject ITwitchService TwitchService
+
+@using TwitchEverywhere.Core.Types.Messages.Interfaces
 @using TwitchEverywhere.Core.Types
 @using SimpleTwitch.Data
 @using System.Reflection
 @using System.Text.Json
+@using SimpleTwitch.Services
+@using TwitchEverywhere.Core.Types.RestApi.Wrappers
+@using System.Net
+@using TwitchEverywhere.Core.Types.RestApi.Users
+@using System.Globalization
 
-<div class="user-info-dialog">
-    <div class="user-info-dialog-header">
-        <h2>@Message.DisplayName</h2>
-        <button class="user-info-dialog-close-button" @onclick="OnClose">X</button>
+@if( m_loading ) {
+    <div class="user-info-dialog">
+        asdsad
     </div>
-    <div class="badge-container">
-        <h5>BADGES</h5>
-        <div class="badge-list">
-            @foreach (Badge badge in Message.Badges) {
-                @if( m_globalBadges != null && m_globalBadges.TryGetValue( badge.Name, value: out GameInfo? badgeInfo ) ) {
-                    <img title="@badgeInfo.Versions[0].Description" alt="@badgeInfo.Versions[0].Description" class="twitch-badge" src="@badgeInfo.Versions[0].ImageUrl2x"/>
+} else {
+    <div class="user-info-dialog">
+        <div class="user-info-dialog-header">
+            <div class="user-info-container">
+                <img alt="" class="profile-image" src="@m_profileImageUrl"/>
+                <div class="user-info">
+                    <span class="profile-display-name">@m_user.DisplayName</span>
+                    <span class="profile-creation-date">🎂 @m_user.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                </div>
+            </div>
+            <button class="user-info-dialog-close-button" @onclick="OnClose">X</button>
+        </div>
+        <div class="badge-container">
+            <h5>BADGES</h5>
+            <div class="badge-list">
+                @foreach (Badge badge in Message.Badges) {
+                    @if( m_globalBadges != null && m_globalBadges.TryGetValue( badge.Name, value: out GameInfo? badgeInfo ) ) {
+                        <img 
+                            title="@badgeInfo.Versions[0].Description" 
+                            alt="@badgeInfo.Versions[0].Description" 
+                            class="twitch-badge" 
+                            src="@badgeInfo.Versions[0].ImageUrl1x"/>
+                    }
                 }
-            }
+            </div>
         </div>
     </div>
-</div>
+}
+
 
 @code {
     [Parameter]
@@ -28,13 +52,18 @@
     [Parameter]
     public EventCallback OnClose { get; set; }
     
+    private UserEntry m_user;
+    private bool m_loading = true;
+    private ITwitchService m_service;
     private Dictionary<string, GameInfo> m_globalBadges = new();
-
     private JsonSerializerOptions m_options = new() {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true
     };
-    
+
+    private string m_messageId;
+    private string m_profileImageUrl;
+
     protected override async Task OnInitializedAsync() {
         Assembly assembly = GetType().Assembly;
         const string resourceName = "SimpleTwitch.Resources.Json.global-badges.json";
@@ -42,5 +71,45 @@
         using StreamReader reader = new(stream);
         string json = await reader.ReadToEndAsync();
         m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options);
+        m_service = TwitchService;
+        
+        GetUsersResponse response = await m_service.GetUsers( Message.DisplayName.ToLower() );
+        if( response.StatusCode != HttpStatusCode.OK ) {
+            m_profileImageUrl = "https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_150x150.png";
+            return;
+        }
+        
+        m_user = response.ApiResponse.Data[0];
+        m_profileImageUrl = m_user.ProfileImageUrl;
+        m_messageId = Message.Id;
+        m_loading = false;
+    }
+    
+    protected override async Task OnParametersSetAsync() {
+
+        if( Message.Id == m_messageId ) {
+            return;
+        }
+        
+        m_loading = true;
+        GetUsersResponse response = await m_service.GetUsers( Message.DisplayName.ToLower() );
+        if( response.StatusCode != HttpStatusCode.OK ) {
+            m_profileImageUrl = "https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_150x150.png";
+            m_loading = false;
+            return;
+        }
+        
+        m_user = response.ApiResponse.Data[0];
+        m_profileImageUrl = m_user.ProfileImageUrl;
+        m_messageId = Message.Id;
+        m_loading = false;
+    }
+    
+    private string GetFormattedDate( string twitchDate ) {
+        return DateTime.ParseExact(
+                s: twitchDate, 
+                format: "M/d/yyyy h:mm:ss tt", 
+                provider: CultureInfo.InvariantCulture
+            ).ToString("MMMM dd, yyyy");
     }
 }
