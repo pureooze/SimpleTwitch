@@ -6,12 +6,14 @@
     --dark-accent-color: #303030;
     --prpl-accent-color: #9147ff;
     --font-color: #d7d7d7;
+    --dark-font-color: #a0a0a0;
+    --accent-font-color: #a26afc;
     --chat-light-bg: #18181bff;
     --chat-dark-bg: #1F1925FF;
 }
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     overflow-x: hidden;
     background-color: var(--primary-color);
     scrollbar-color: #505050 #303030;

@@ -10,6 +10,7 @@
 @using TwitchEverywhere.Core.Types
 @using TwitchEverywhere.Core.Types.RestApi.Wrappers
 @using System.Net
+@using TwitchEverywhere.Core.Types.RestApi.Channel
 
 @if( string.IsNullOrEmpty( m_displayName ) && m_isLoading == false ) {
     <div class="initial-search-page">
@@ -58,12 +59,16 @@
             <div class="header-title-container">
                 <img alt="" class="profile-image" src="@m_profileImageUrl"/>
 			    <div class="channel-info-container">
-				    <h2>@m_displayName</h2>
-				    <div class="tag-container">
-					    @foreach (string tag in m_tags) {
-						    <span class="tag">@tag</span>
-					    }
-				    </div>
+                    <h2 class="channel-title">@m_channelInfo.BroadcasterName</h2>
+                    <span class="stream-title">@m_channelInfo.Title</span>
+                    <div class="stream-meta-container">
+                        <span class="channel-game-name">@m_channelInfo.GameName</span>
+                        <div class="tag-container">
+                            @foreach (string tag in m_channelInfo.Tags) {
+                                <span class="tag">@tag</span>
+                            }
+                        </div>
+                    </div>
 			    </div>
             </div>
             <div class="input-container">
@@ -77,7 +82,7 @@
             <div class="chat-container">
                 <div class="chat">
                     <div class="chat-wrapper">
-                        @foreach (IPrivMsg message in m_messages.Reverse()) {
+                        @foreach (IPrivMsg message in m_messages) {
                             <ChatMessage Message="@message" OnChildActionWithData="ParentMethodWithData"></ChatMessage>
                         }
                     </div>
@@ -104,11 +109,11 @@
     private string m_input = "";
     private string m_displayName = "";
     private string m_profileImageUrl = "";
-    private List<string> m_tags = [];
     
     private bool m_userInfoDialogVisible;
     private IPrivMsg m_userInfoTarget;
-    
+    private ChannelInfoEntry m_channelInfo;
+
     protected override async Task OnInitializedAsync() {
         m_batchSize = Configuration.GetValue<int>( "Settings:BufferSize" );
         m_service = TwitchService;
@@ -165,7 +170,8 @@
         
         m_displayName = response.ApiResponse.Data[0].DisplayName;
         m_profileImageUrl = response.ApiResponse.Data[0].ProfileImageUrl;
-        m_tags = channelInfoResponse.ApiResponse.Data[0].Tags;
+        
+        m_channelInfo = channelInfoResponse.ApiResponse.Data[0];
         
         m_isLoading = false;
         StateHasChanged();

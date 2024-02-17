@@ -2,7 +2,7 @@
     position: absolute;
     top: 0px; /* Adjust as needed */
     right: 10px; /* Adjust as needed */
-    width: 98%; /* Adjust based on content */
+    width: 99%; /* Adjust based on content */
     height: 250px; /* Adjust based on content */
     background-color: var(--primary-color);
     padding: 1em;
@@ -46,5 +46,42 @@
     flex-direction: row;
     flex-wrap: wrap;
     column-gap: 0.5em;
+    row-gap: 0.5em;
+}
+
+.twitch-badge {
+    border: 1px solid var(--dark-accent-color);
+    padding: 0.25em;
+    height: 35px;
+}
+
+.profile-image {
+    width: 3em;
+    height: 3em;
+    border-radius: 50%;
+    margin-right: 0.5em;
+    outline: var(--prpl-accent-color) solid 2px;
+}
+
+.profile-display-name {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--font-color);
+}
+
+.profile-creation-date {
+    color: var(--font-color);
+}
+
+.user-info-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 0.5em;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
     row-gap: 0.5em;
 }

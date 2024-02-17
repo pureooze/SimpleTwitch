@@ -88,6 +88,11 @@
     margin: auto;
 }
 
+.channel-title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
 .profile-image {
     width: 3em;
     height: 3em;
@@ -97,9 +102,10 @@
 }
 
 .tag {
-    font-size: 0.8em;
+    font-size: 0.7em;
     padding: 0.2em 0.5em;
     background-color: var(--secondary-color);
+    color: var(--dark-font-color);
     border-radius: 0.25em;
     border: var(--dark-accent-color) 1px solid;
 }
@@ -155,14 +161,14 @@
     text-align: left;
     line-height: 1.1;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     flex-grow: 1;
     overflow-y: auto;
 }
 
 .chat-wrapper {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     height: 100%;
 }
 
@@ -185,4 +191,24 @@
     font-weight: bold;
     align-self: flex-end;
     margin-right: 0.5em;
+}
+
+.stream-meta-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 0.5em;
+    padding: 0.5em 0em;
+    background-color: var(--primary-color);
+}
+
+.stream-title {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: var(--font-color);
+}
+
+.channel-game-name {
+    font-size: 0.8em;
+    color: var(--font-color);
 }
