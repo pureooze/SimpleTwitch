@@ -1,4 +1,5 @@
 ﻿@inject ITwitchService TwitchService
+@inject NavigationManager NavigationManager
 
 @using System.Reflection
 @using System.Text.Json
@@ -25,7 +26,7 @@
 
             @foreach (UserEntry user in m_users) {
                 <div class="nav-item small-button">
-                    <button class="nav-icon-button">
+                    <button class="nav-icon-button" @onclick="() => OnClick(user.Login)">
                         <img class="nav-icon" alt="@user.DisplayName" src="@user.ProfileImageUrl"/>
                     </button>
                 </div>
@@ -57,6 +58,10 @@
         }
         
         m_loading = false;
+    }
+    
+    private void OnClick( string loginName ) {
+        NavigationManager.NavigateTo( $"/stream/{loginName}" );
     }
 
 }
