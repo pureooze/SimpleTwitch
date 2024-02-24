@@ -1,54 +1,62 @@
-﻿<div class="sidebar @(isSidebarCollapsed ? "collapsed" : "")">
+﻿@inject ITwitchService TwitchService
 
-	<div class="top-row nav-dark">
-		<div class="container-fluid">
-			<span class="brand-text" href="">@appLabel</span>
-		</div>
-	</div>
+@using System.Reflection
+@using System.Text.Json
+@using System.Windows.Forms
+@using SimpleTwitch.Data
+@using SimpleTwitch.Services
+@using TwitchEverywhere.Core.Types.RestApi.Users
+@using TwitchEverywhere.Core.Types.RestApi.Wrappers
+@using System.Net
 
-	<div class="nav-scrollable">
-		<button class="toggle-button nav-item " @onclick="ToggleSidebar">@expandCollapseCharacter</button>
-		<nav class="flex-column">
-			@if (isSidebarCollapsed) {
-				<div class="nav-item small-button">
-					<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-						<span class="nav-icon-small" aria-hidden="true">🏠</span>
-					</NavLink>
-				</div>
-			} else {
-				<div class="nav-item">
-					<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-						<span>Home</span>
-					</NavLink>
-				</div>
-			}
-		</nav>
-	</div>
-</div>
+@if( m_loading ) {
+    <div class="sidebar">
+        <nav class="nav-items">
+            <div class="nav-item small-button">
+                <button class="nav-icon-button">
+                    <img class="nav-icon" alt="" src="https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_150x150.png"/>
+                </button>
+            </div>
+        </nav>
+    </div>
+} else {
+    <div class="sidebar">
+        <nav class="nav-items">
+
+            @foreach (UserEntry user in m_users) {
+                <div class="nav-item small-button">
+                    <button class="nav-icon-button">
+                        <img class="nav-icon" alt="@user.DisplayName" src="@user.ProfileImageUrl"/>
+                    </button>
+                </div>
+            }
+        </nav>
+    </div>
+}
 
 @code {
-	private bool isSidebarCollapsed = false;
-	private string appLabel = "ST";
-	private string expandCollapseCharacter = "«";
-	private System.Timers.Timer labelTimer;
+    List<UserEntry> m_users = [];
+    private bool m_loading = true;
+    
+    protected override async Task OnInitializedAsync() {
+        Assembly assembly = GetType().Assembly;
+        const string resourceName = "SimpleTwitch.Resources.Json.fav.json";
+        await using Stream? stream = assembly.GetManifestResourceStream(resourceName);
+        using StreamReader reader = new(stream);
+        string json = await reader.ReadToEndAsync();
+        List<string> usernames = JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        
+        foreach (string username in usernames) {
+            GetUsersResponse response = await TwitchService.GetUsers( username.ToLower() );
+            
+            if( response.StatusCode != HttpStatusCode.OK ) {
+                continue;
+            }
+            
+            m_users.Add(response.ApiResponse.Data[0]);
+        }
+        
+        m_loading = false;
+    }
 
-	public NavMenu() {
-		labelTimer = new System.Timers.Timer(500);
-		labelTimer.Elapsed += OnTimedEvent;
-		labelTimer.AutoReset = false;
-	}
-
-	void ToggleSidebar() {
-		isSidebarCollapsed = !isSidebarCollapsed;
-		expandCollapseCharacter = isSidebarCollapsed ? "»" : "«";
-
-		// Start the timer
-		labelTimer.Start();
-	}
-
-	private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e) {
-		InvokeAsync(() => {
-			StateHasChanged();
-		});
-	}
 }

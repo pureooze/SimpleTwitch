@@ -1,22 +1,4 @@
-﻿.navbar-toggler {
-    appearance: none;
-    cursor: pointer;
-    width: 3.5rem;
-    height: 2.5rem;
-    color: white;
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.75rem rgba(255, 255, 255, 0.1);
-}
-
-.navbar-toggler:checked {
-    background-color: rgba(255, 255, 255, 0.5);
-}
-
-.top-row {
-    height: 3.5rem;
+﻿.top-row {
     background-color: #9332DA;
 }
 
@@ -26,9 +8,9 @@
 
 .brand-text {
     color: #d7d7d7;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    padding-right: 1em;
+    padding: 0.5em 0em;
 }
 
 .home-icon {
@@ -36,65 +18,35 @@
 }
 
 .small-button {
-    padding-right: 1rem;
-    padding-left: 1rem;
+    padding-right: 0.1rem;
+    padding-left: 0.1rem;
 }
 
-.nav-icon-small {
-    padding: auto;
-    text-align: center;
+.nav-icon-button {
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    border: none;
 }
 
-.nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
-}
-
-.nav-item:first-of-type {
-    padding-top: 1rem;
-}
-
-.nav-item:last-of-type {
-    padding-bottom: 1rem;
-}
-
-.nav-item ::deep a {
-    color: #d7d7d7;
-    border-radius: 4px;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    line-height: 3rem;
-}
-
-.nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.37);
-    color: white;
-}
-
-.nav-item ::deep a:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-}
-
-.nav-scrollable {
-    display: none;
-    height: 100%;
-}
-
-.navbar-toggler:checked ~ .nav-scrollable {
-    display: block;
+.nav-icon {
+    border-radius: 50%;
+    border: var(--prpl-accent-color) solid 2px;
+    height: 3em;
+    width: 3em;
 }
 
 .sidebar {
-    transition: width 0.5s ease, padding 0.5s ease; /* Add transition for padding */
-    padding: 20px; /* Adjust padding as needed */
     background-color: #262626;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-.sidebar.collapsed {
-    overflow-x: hidden;
-    padding: 20px 0;
+.nav-items {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1em;
 }
 
 .container-fluid {

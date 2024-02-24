@@ -6,6 +6,7 @@
     height: 250px; /* Adjust based on content */
     background-color: var(--primary-color);
     padding: 1em;
+    border-bottom: 5px solid var(--prpl-accent-color);
 }
 
 .user-info-dialog-header {
@@ -31,13 +32,20 @@
     outline: var(--prpl-accent-color) solid 2px;
 }
 
+
 .badge-container {
     display: flex;
     flex-direction: column;
     row-gap: 0.5em;
     margin-top: 1em;
     padding: 1.5em 0.1em;
-    border-top: 3px solid var(--prpl-accent-color);
+    border-top: 3px solid var(--dark-accent-color);
+    color: var(--font-color);
+}
+
+.badge-container-title {
+    font-size: 1em;
+    font-weight: 700;
     color: var(--font-color);
 }
 

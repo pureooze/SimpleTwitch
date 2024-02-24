@@ -13,7 +13,6 @@
 
 @if( m_loading ) {
     <div class="user-info-dialog">
-        asdsad
     </div>
 } else {
     <div class="user-info-dialog">
@@ -28,7 +27,7 @@
             <button class="user-info-dialog-close-button" @onclick="OnClose">X</button>
         </div>
         <div class="badge-container">
-            <h5>BADGES</h5>
+            <h5 class="badge-container-title">BADGES</h5>
             <div class="badge-list">
                 @foreach (Badge badge in Message.Badges) {
                     @if( m_globalBadges != null && m_globalBadges.TryGetValue( badge.Name, value: out GameInfo? badgeInfo ) ) {
@@ -70,7 +69,7 @@
         await using Stream? stream = assembly.GetManifestResourceStream(resourceName);
         using StreamReader reader = new(stream);
         string json = await reader.ReadToEndAsync();
-        m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options);
+        m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options) ?? [];
         m_service = TwitchService;
         
         GetUsersResponse response = await m_service.GetUsers( Message.DisplayName.ToLower() );

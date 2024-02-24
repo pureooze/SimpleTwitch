@@ -1,13 +1,14 @@
 ﻿using TwitchEverywhere.Core.Types;
+using TwitchEverywhere.Core.Types.Messages.Interfaces;
 using TwitchEverywhere.Core.Types.RestApi.Wrappers;
 
 namespace SimpleTwitch.Services;
 
 public interface ITwitchService {
     
-    Task ConnectToIrcChannel( 
+    void ConnectToIrcChannel( 
         string channel,
-        Action<IMessage> messageCallback
+        Action<IPrivMsg> messageCallback
     );
 
     Task DisconnectFromIrcChannel();
