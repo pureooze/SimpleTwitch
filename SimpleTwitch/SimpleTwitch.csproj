@@ -69,6 +69,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
         <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
+        <PackageReference Include="System.Reactive" Version="6.0.0" />
         <PackageReference Include="VodOnDemand.TwitchEverywhere.Core" Version="0.7.0" />
         <PackageReference Include="VodOnDemand.TwitchEverywhere.Irc" Version="0.7.0" />
         <PackageReference Include="VodOnDemand.TwitchEverywhere.Rest" Version="0.6.2" />

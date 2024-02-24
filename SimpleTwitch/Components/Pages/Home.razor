@@ -1,176 +1,22 @@
-﻿@inject IConfiguration Configuration
-@inject ITwitchService TwitchService
+﻿@page "/"
 
-@page "/"
-@using Microsoft.Extensions.Configuration
-@using SimpleTwitch.Components.Layout
-@using TwitchEverywhere.Core.Types.Messages.Implementation
-@using TwitchEverywhere.Core.Types.Messages.Interfaces
-@using SimpleTwitch.Services
-@using TwitchEverywhere.Core.Types.RestApi.Wrappers
-@using System.Net
-@using TwitchEverywhere.Core.Types.RestApi.Channel
+@inject NavigationManager NavigationManager
 
-@if( string.IsNullOrEmpty( m_displayName ) && m_isLoading == false ) {
-    <div class="initial-search-page">
-        <h1>Simple Twitch</h1>
-        <div class="initial-input-container">
-            <input placeholder="Search for a channel.." class="user-input" @bind="m_input" @bind:event="oninput" @onkeyup="HandleEnterPressed"/>
-        </div>
+<div class="initial-search-page">
+    <h1>Simple Twitch</h1>
+    <div class="initial-input-container">
+        <input placeholder="Search for a channel.." class="user-input" @bind="m_input" @bind:event="oninput" @onkeyup="HandleEnterPressed"/>
     </div>
-} else if( m_isLoading ) {
-    <div>
-        <div class="header">
-            <div class="header-title-container">
-                <div class="loader profile-image"></div>
-            	<div class="channel-info-container">
-            		<h2>@m_displayName</h2>
-            		<div class="shimmer tag-container"></div>
-            	</div>
-            </div>
-            <div class="input-container">
-                <input disabled class="user-input" @bind="m_input" @bind:event="oninput" @onkeyup="HandleEnterPressed"/>
-            </div>
-        </div>
-        <div class="stream-page-content">
-            <div class="video">
-            </div>
-
-            <div class="chat-container">
-                <div class="chat">
-                    <div class="chat-wrapper">
-                        @foreach (IPrivMsg message in m_messages) {
-                            <ChatMessage OnChildActionWithData="ParentMethodWithData" Message="@message" @key="@message.Id"></ChatMessage>
-                        }
-                    </div>
-                </div>
-                <div class="chat-input-container">
-                    <textarea class="chat-input" type="text" placeholder="Send a message"></textarea>
-                    <button class="chat-send-button">Send</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-} else {
-    <div>
-        <div class="header">
-            <div class="header-title-container">
-                <img alt="" class="profile-image" src="@m_profileImageUrl"/>
-			    <div class="channel-info-container">
-                    <h2 class="channel-title">@m_channelInfo.BroadcasterName</h2>
-                    <span class="stream-title">@m_channelInfo.Title</span>
-                    <div class="stream-meta-container">
-                        <span class="channel-game-name">@m_channelInfo.GameName</span>
-                        <div class="tag-container">
-                            @foreach (string tag in m_channelInfo.Tags) {
-                                <span class="tag">@tag</span>
-                            }
-                        </div>
-                    </div>
-			    </div>
-            </div>
-            <div class="input-container">
-                <input class="user-input" @bind="m_input" @bind:event="oninput" @onkeyup="HandleEnterPressed"/>
-            </div>
-        </div>
-        <div class="stream-page-content">
-            <div class="video">
-            </div>
-
-            <div class="chat-container">
-                <div class="chat">
-                    <div class="chat-wrapper">
-                        @foreach (IPrivMsg message in m_messages) {
-                            <ChatMessage Message="@message" OnChildActionWithData="ParentMethodWithData"></ChatMessage>
-                        }
-                    </div>
-                </div>
-                <div class="chat-input-container">
-                    <textarea class="chat-input" type="text" placeholder="Send a message"></textarea>
-                    <button class="chat-send-button">Send</button>
-                </div>
-                @if( m_userInfoDialogVisible ) {
-                    <UserInfoDialog OnClose="CloseUserInfoDialog" Message="@m_userInfoTarget"></UserInfoDialog>
-                }
-            </div>
-
-        </div>
-    </div>
-}
+</div>
 
 
 @code {
-    private readonly Queue<IPrivMsg> m_messages = new();
-    private bool m_isLoading;
-    private int m_batchSize = 100;
-    private ITwitchService m_service;
+
     private string m_input = "";
-    private string m_displayName = "";
-    private string m_profileImageUrl = "";
     
-    private bool m_userInfoDialogVisible;
-    private IPrivMsg m_userInfoTarget;
-    private ChannelInfoEntry m_channelInfo;
-
-    protected override async Task OnInitializedAsync() {
-        m_batchSize = Configuration.GetValue<int>( "Settings:BufferSize" );
-        m_service = TwitchService;
-        m_userInfoDialogVisible = false;
-
-        m_service.ConnectToIrcChannel( channel: m_displayName.ToLower(), MessageCallback );
-    }
-
-    private void MessageCallback(
-        IPrivMsg message
-    ) {
-        if( m_messages.Count > m_batchSize ) {
-            m_messages.Dequeue();
-        }
-
-        m_messages.Enqueue( (PrivMsg)message );
-        StateHasChanged();
-    }
-    
-    private async Task HandleEnterPressed(KeyboardEventArgs e) {
+    private void HandleEnterPressed(KeyboardEventArgs e) {
         if(e.Code == "Enter" || e.Key == "Enter") {
-            await HandleChannelChange();
+            NavigationManager.NavigateTo( $"/stream/{m_input}" );
         }
-    }
-
-    private void ParentMethodWithData(IPrivMsg message) {
-        m_userInfoDialogVisible = true;
-        m_userInfoTarget = message;
-    }
-    
-    private void CloseUserInfoDialog() {
-        m_userInfoDialogVisible = false;
-    }
-    
-    private async Task HandleChannelChange() {
-        m_isLoading = true;
-        m_messages.Clear();
-        StateHasChanged();
-
-        GetUsersResponse response = await m_service.GetUsers( m_input.ToLower() );
-        if( response.StatusCode != HttpStatusCode.OK ) {
-            return;
-        }
-
-        GetChannelInfoResponse channelInfoResponse = await m_service.GetChannelInfo( response.ApiResponse.Data[0].Id );
-        if( channelInfoResponse.StatusCode != HttpStatusCode.OK ) {
-            return;
-        }
-        
-        m_displayName = response.ApiResponse.Data[0].DisplayName;
-        m_profileImageUrl = response.ApiResponse.Data[0].ProfileImageUrl;
-        
-        m_channelInfo = channelInfoResponse.ApiResponse.Data[0];
-        
-        m_isLoading = false;
-        StateHasChanged();
-        await m_service.DisconnectFromIrcChannel();
-        m_service.ConnectToIrcChannel( m_input, MessageCallback );
-
     }
 }
