@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using TwitchEverywhere.Core;
 using TwitchEverywhere.Core.Types;
+using TwitchEverywhere.Core.Types.Messages.Interfaces;
 using TwitchEverywhere.Core.Types.RestApi.Wrappers;
 using TwitchEverywhere.Irc;
+using TwitchEverywhere.Irc.Types;
 using TwitchEverywhere.Rest;
 
 namespace SimpleTwitch.Services;
@@ -18,12 +20,16 @@ public class TwitchService : ITwitchService {
         InitializeRestClient();
     }
 
-    async Task ITwitchService.ConnectToIrcChannel(
+    void ITwitchService.ConnectToIrcChannel(
         string channel,
-        Action<IMessage> messageCallback
+        Action<IPrivMsg> messageCallback
     ) {
         InitializeIrcClient( channel );
-        await m_ircClient.ConnectToChannel( messageCallback );
+        IrcClientObservable observable = m_ircClient.ConnectToChannelRx();
+        
+        observable.PrivMsgObservable.Subscribe( 
+            msg => messageCallback(msg)
+        );
     }
 
     async Task ITwitchService.DisconnectFromIrcChannel() {

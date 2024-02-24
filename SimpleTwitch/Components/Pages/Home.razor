@@ -7,7 +7,6 @@
 @using TwitchEverywhere.Core.Types.Messages.Implementation
 @using TwitchEverywhere.Core.Types.Messages.Interfaces
 @using SimpleTwitch.Services
-@using TwitchEverywhere.Core.Types
 @using TwitchEverywhere.Core.Types.RestApi.Wrappers
 @using System.Net
 @using TwitchEverywhere.Core.Types.RestApi.Channel
@@ -119,23 +118,18 @@
         m_service = TwitchService;
         m_userInfoDialogVisible = false;
 
-        await m_service.ConnectToIrcChannel( channel: m_displayName.ToLower(), MessageCallback );
+        m_service.ConnectToIrcChannel( channel: m_displayName.ToLower(), MessageCallback );
     }
 
     private void MessageCallback(
-        IMessage message
+        IPrivMsg message
     ) {
-        switch( message.MessageType ) {
-            case MessageType.PrivMsg:
-                if( m_messages.Count > m_batchSize ) {
-                    m_messages.Dequeue();
-                }
-
-                m_messages.Enqueue( (PrivMsg)message );
-                StateHasChanged();
-                break;
+        if( m_messages.Count > m_batchSize ) {
+            m_messages.Dequeue();
         }
 
+        m_messages.Enqueue( (PrivMsg)message );
+        StateHasChanged();
     }
     
     private async Task HandleEnterPressed(KeyboardEventArgs e) {
@@ -176,7 +170,7 @@
         m_isLoading = false;
         StateHasChanged();
         await m_service.DisconnectFromIrcChannel();
-        await m_service.ConnectToIrcChannel( m_input, MessageCallback );
+        m_service.ConnectToIrcChannel( m_input, MessageCallback );
 
     }
 }
