@@ -1,4 +1,5 @@
 ﻿@inject ITwitchService TwitchService
+@inject ResourceService ResourceService
 
 @using TwitchEverywhere.Core.Types.Messages.Interfaces
 @using TwitchEverywhere.Core.Types
@@ -64,12 +65,7 @@
     private string m_profileImageUrl;
 
     protected override async Task OnInitializedAsync() {
-        Assembly assembly = GetType().Assembly;
-        const string resourceName = "SimpleTwitch.Resources.Json.global-badges.json";
-        await using Stream? stream = assembly.GetManifestResourceStream(resourceName);
-        using StreamReader reader = new(stream);
-        string json = await reader.ReadToEndAsync();
-        m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options) ?? [];
+        m_globalBadges = await ResourceService.GetGlobalBadges();
         m_service = TwitchService;
         
         GetUsersResponse response = await m_service.GetUsers( Message.DisplayName.ToLower() );

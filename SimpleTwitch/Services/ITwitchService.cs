@@ -1,5 +1,4 @@
-﻿using TwitchEverywhere.Core.Types;
-using TwitchEverywhere.Core.Types.Messages.Interfaces;
+﻿using TwitchEverywhere.Core.Types.Messages.Interfaces;
 using TwitchEverywhere.Core.Types.RestApi.Wrappers;
 
 namespace SimpleTwitch.Services;
@@ -19,5 +18,9 @@ public interface ITwitchService {
     
     Task<GetChannelInfoResponse> GetChannelInfo( 
         string broadcasterId
+    );
+    
+    Task<GetStreamsResponse> GetLiveStreams( 
+        string[] logins
     );
 }

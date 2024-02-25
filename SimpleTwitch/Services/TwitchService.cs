@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using TwitchEverywhere.Core;
-using TwitchEverywhere.Core.Types;
 using TwitchEverywhere.Core.Types.Messages.Interfaces;
 using TwitchEverywhere.Core.Types.RestApi.Wrappers;
 using TwitchEverywhere.Irc;
@@ -53,6 +52,13 @@ public class TwitchService : ITwitchService {
     ) {
         InitializeRestClient();
         return m_restClient.GetChannelInfo( broadcasterId );
+    }
+    
+    Task<GetStreamsResponse> ITwitchService.GetLiveStreams(
+        string[] logins
+    ) {
+        InitializeRestClient();
+        return m_restClient.GetStreams( logins );
     }
 
     private void InitializeIrcClient( string channel ) {
