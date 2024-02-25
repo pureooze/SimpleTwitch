@@ -1,4 +1,5 @@
 ﻿@inject ITwitchService TwitchService
+@inject ResourceService ResourceService
 @inject NavigationManager NavigationManager
 
 @using System.Reflection
@@ -9,6 +10,7 @@
 @using TwitchEverywhere.Core.Types.RestApi.Users
 @using TwitchEverywhere.Core.Types.RestApi.Wrappers
 @using System.Net
+@using TwitchEverywhere.Core.Types.RestApi.Streams
 
 @if( m_loading ) {
     <div class="sidebar">
@@ -26,8 +28,11 @@
 
             @foreach (UserEntry user in m_users) {
                 <div class="nav-item small-button">
-                    <button class="nav-icon-button" @onclick="() => OnClick(user.Login)">
-                        <img class="nav-icon" alt="@user.DisplayName" src="@user.ProfileImageUrl"/>
+                    <button class="nav-icon-button" @onclick="() => OnClick( user.Login )">
+                        @{
+                            bool isGrayscale = !m_liveStreams.Contains( user.Login );
+                        }
+                        <img class="nav-icon @(isGrayscale ? "grayscale" : "")" alt="@user.DisplayName" src="@user.ProfileImageUrl"/>
                     </button>
                 </div>
             }
@@ -38,14 +43,10 @@
 @code {
     List<UserEntry> m_users = [];
     private bool m_loading = true;
-    
+    private HashSet<string> m_liveStreams = [];
+
     protected override async Task OnInitializedAsync() {
-        Assembly assembly = GetType().Assembly;
-        const string resourceName = "SimpleTwitch.Resources.Json.fav.json";
-        await using Stream? stream = assembly.GetManifestResourceStream(resourceName);
-        using StreamReader reader = new(stream);
-        string json = await reader.ReadToEndAsync();
-        List<string> usernames = JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        List<string> usernames = await ResourceService.GetFavs();
         
         foreach (string username in usernames) {
             GetUsersResponse response = await TwitchService.GetUsers( username.ToLower() );
@@ -55,6 +56,12 @@
             }
             
             m_users.Add(response.ApiResponse.Data[0]);
+        }
+        
+        GetStreamsResponse liveStreamsResponse = await TwitchService.GetLiveStreams( usernames.ToArray() );
+        
+        if( liveStreamsResponse.StatusCode == HttpStatusCode.OK ) {
+            m_liveStreams = [..liveStreamsResponse.ApiResponse.Data.Select( stream => stream.UserLogin )];
         }
         
         m_loading = false;

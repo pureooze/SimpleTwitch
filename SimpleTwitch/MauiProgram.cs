@@ -21,6 +21,7 @@ namespace SimpleTwitch {
             builder.Configuration.AddJsonFile( "twitch.json", true, true );
 
             builder.Services.AddSingleton<ITwitchService , TwitchService>();
+            builder.Services.AddSingleton<ResourceService , ResourceService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

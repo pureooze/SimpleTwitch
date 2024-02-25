@@ -35,6 +35,10 @@
     width: 3em;
 }
 
+.nav-icon.grayscale {
+    border: none;
+}
+
 .sidebar {
     background-color: #262626;
     display: flex;

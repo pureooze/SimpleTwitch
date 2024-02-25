@@ -1,9 +1,12 @@
-﻿@using TwitchEverywhere.Core.Types.Messages.Interfaces
+﻿@inject ResourceService ResourceService
+
+@using TwitchEverywhere.Core.Types.Messages.Interfaces
 @using System.Text.Json
 @using System.Text.Json.Serialization
 @using TwitchEverywhere.Core.Types
 @using System.Reflection
 @using SimpleTwitch.Data
+@using SimpleTwitch.Services
 
 <div class="chat-message">
 	<span class="username">
@@ -29,23 +32,11 @@
     
 	private Dictionary<string, GameInfo> m_globalBadges = new();
     
-    private JsonSerializerOptions m_options = new() {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
-    };
-    
 	protected override async Task OnInitializedAsync() {
-		Assembly assembly = GetType().Assembly;
-		const string resourceName = "SimpleTwitch.Resources.Json.global-badges.json";
-        await using Stream? stream = assembly.GetManifestResourceStream(resourceName);
-		using StreamReader reader = new(stream);
-		string json = await reader.ReadToEndAsync();
-		m_globalBadges = JsonSerializer.Deserialize<Dictionary<string, GameInfo>>(json, m_options);
-
+		m_globalBadges = await ResourceService.GetGlobalBadges();
 	}
     
     private async Task HandleUsernameClick(IPrivMsg message) {
-        Console.WriteLine("Username clicked ");
         if( OnChildActionWithData.HasDelegate ) {
             await OnChildActionWithData.InvokeAsync( message );
         }

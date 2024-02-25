@@ -123,6 +123,11 @@ input:focus, textarea:focus {
     color: #e50000;
 }
 
+img.grayscale {
+    filter: grayscale(100%) contrast(85%);
+    opacity: 0.8;
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
