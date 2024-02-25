@@ -1,11 +1,31 @@
 ﻿@page "/"
 
+@using SimpleTwitch.Services
+@using TwitchEverywhere.Core.Types.RestApi.Wrappers
+@using System.Net
+@using TwitchEverywhere.Core.Types.RestApi.Channel
+
 @inject NavigationManager NavigationManager
+@inject ITwitchService TwitchService
 
 <div class="initial-search-page">
     <h1>Simple Twitch</h1>
     <div class="initial-input-container">
-        <input placeholder="Search for a channel.." class="user-input" @bind="m_input" @bind:event="oninput" @onkeyup="HandleEnterPressed"/>
+        <input
+            placeholder="Search for a channel.."
+            class="user-input"
+            @bind="m_input"
+            @oninput="OnUserInput"
+            @onkeyup="HandleEnterPressed" 
+        />
+    </div>
+    <div class="search-results">
+        @foreach( ChannelSearchResultEntry result in m_results ) {
+            <div class="search-result">
+                <img src="@result.ThumbnailUrl" alt="Channel Thumbnail" />
+                <p>@result.DisplayName</p>
+            </div>
+        }
     </div>
 </div>
 
@@ -13,6 +33,34 @@
 @code {
 
     private string m_input = "";
+    private Timer? debounceTimer;
+    private readonly TimeSpan debouncePeriod = TimeSpan.FromMilliseconds( 500 );
+    private List<ChannelSearchResultEntry> m_results = [];
+
+    private void OnUserInput(ChangeEventArgs e) {
+        m_input = e.Value.ToString();
+        debounceTimer?.Dispose();
+        debounceTimer = new Timer(OnDebounceTimerElapsed, null, debouncePeriod, Timeout.InfiniteTimeSpan);
+    }
+    
+    private void OnDebounceTimerElapsed(object state) {
+        InvokeAsync(() =>
+        {
+            DoSomethingOnInput();
+            StateHasChanged();
+        });
+    }
+    
+    private async void DoSomethingOnInput() {
+        GetChannelSearchResponse searchResult = await TwitchService.SearchForChannel( m_input );
+
+        if( searchResult.StatusCode != HttpStatusCode.OK ) {
+            return;
+        }
+        
+        m_results = searchResult.ApiResponse.Data.ToList();
+        
+    }
     
     private void HandleEnterPressed(KeyboardEventArgs e) {
         if(e.Code == "Enter" || e.Key == "Enter") {
