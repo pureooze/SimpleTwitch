@@ -18,12 +18,17 @@
             @oninput="OnUserInput"
             @onkeyup="HandleEnterPressed" 
         />
-    </div>
-    <div class="search-results">
-        @foreach( ChannelSearchResultEntry result in m_results ) {
-            <div class="search-result">
-                <img src="@result.ThumbnailUrl" alt="Channel Thumbnail" />
-                <p>@result.DisplayName</p>
+        @if( m_results.Count > 0 ) {
+            <div class="search-results">
+                @foreach( ChannelSearchResultEntry result in m_results ) {
+                    <a href="/stream/@result.BroadcasterLogin" class="search-result">
+                        <img class="search-result-thumbnail" src="@result.ThumbnailUrl" alt="" />
+                        <span class="search-result-name">@result.DisplayName</span>
+                        @if( result.IsLive ) {
+                            <span class="search-result-live">Live</span>
+                        }
+                    </a>
+                }
             </div>
         }
     </div>
@@ -33,22 +38,27 @@
 @code {
 
     private string m_input = "";
-    private Timer? debounceTimer;
-    private readonly TimeSpan debouncePeriod = TimeSpan.FromMilliseconds( 500 );
+    private CancellationTokenSource m_debounceCts = new();
+    private readonly TimeSpan m_debouncePeriod = TimeSpan.FromMilliseconds( 100 );
     private List<ChannelSearchResultEntry> m_results = [];
 
-    private void OnUserInput(ChangeEventArgs e) {
-        m_input = e.Value.ToString();
-        debounceTimer?.Dispose();
-        debounceTimer = new Timer(OnDebounceTimerElapsed, null, debouncePeriod, Timeout.InfiniteTimeSpan);
+    public void Dispose() {
+        m_debounceCts.Cancel();
+        m_debounceCts.Dispose();
     }
     
-    private void OnDebounceTimerElapsed(object state) {
-        InvokeAsync(() =>
-        {
+    private async void OnUserInput(ChangeEventArgs e) {
+        m_input = e.Value?.ToString() ?? string.Empty;
+        await m_debounceCts.CancelAsync();
+        m_debounceCts = new CancellationTokenSource();
+
+        try {
+            await Task.Delay( m_debouncePeriod, m_debounceCts.Token );
+            
             DoSomethingOnInput();
-            StateHasChanged();
-        });
+        } catch( TaskCanceledException ) {
+            // Do nothing
+        }
     }
     
     private async void DoSomethingOnInput() {
@@ -59,7 +69,7 @@
         }
         
         m_results = searchResult.ApiResponse.Data.ToList();
-        
+        StateHasChanged();
     }
     
     private void HandleEnterPressed(KeyboardEventArgs e) {

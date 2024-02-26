@@ -58,7 +58,7 @@ public class TwitchService : ITwitchService {
         string query
     ) {
         InitializeRestClient();
-        return m_restClient.SearchForChannel( query, 3 );
+        return m_restClient.SearchForChannel( query, 6 );
     }
     
     Task<GetStreamsResponse> ITwitchService.GetLiveStreams(
