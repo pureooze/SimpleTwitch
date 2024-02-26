@@ -1,11 +1,36 @@
 ﻿@page "/"
 
+@using SimpleTwitch.Services
+@using TwitchEverywhere.Core.Types.RestApi.Wrappers
+@using System.Net
+@using TwitchEverywhere.Core.Types.RestApi.Channel
+
 @inject NavigationManager NavigationManager
+@inject ITwitchService TwitchService
 
 <div class="initial-search-page">
     <h1>Simple Twitch</h1>
     <div class="initial-input-container">
-        <input placeholder="Search for a channel.." class="user-input" @bind="m_input" @bind:event="oninput" @onkeyup="HandleEnterPressed"/>
+        <input
+            placeholder="Search for a channel.."
+            class="user-input"
+            @bind="m_input"
+            @oninput="OnUserInput"
+            @onkeyup="HandleEnterPressed" 
+        />
+        @if( m_results.Count > 0 ) {
+            <div class="search-results">
+                @foreach( ChannelSearchResultEntry result in m_results ) {
+                    <a href="/stream/@result.BroadcasterLogin" class="search-result">
+                        <img class="search-result-thumbnail" src="@result.ThumbnailUrl" alt="" />
+                        <span class="search-result-name">@result.DisplayName</span>
+                        @if( result.IsLive ) {
+                            <span class="search-result-live">Live</span>
+                        }
+                    </a>
+                }
+            </div>
+        }
     </div>
 </div>
 
@@ -13,6 +38,39 @@
 @code {
 
     private string m_input = "";
+    private CancellationTokenSource m_debounceCts = new();
+    private readonly TimeSpan m_debouncePeriod = TimeSpan.FromMilliseconds( 100 );
+    private List<ChannelSearchResultEntry> m_results = [];
+
+    public void Dispose() {
+        m_debounceCts.Cancel();
+        m_debounceCts.Dispose();
+    }
+    
+    private async void OnUserInput(ChangeEventArgs e) {
+        m_input = e.Value?.ToString() ?? string.Empty;
+        await m_debounceCts.CancelAsync();
+        m_debounceCts = new CancellationTokenSource();
+
+        try {
+            await Task.Delay( m_debouncePeriod, m_debounceCts.Token );
+            
+            DoSomethingOnInput();
+        } catch( TaskCanceledException ) {
+            // Do nothing
+        }
+    }
+    
+    private async void DoSomethingOnInput() {
+        GetChannelSearchResponse searchResult = await TwitchService.SearchForChannel( m_input );
+
+        if( searchResult.StatusCode != HttpStatusCode.OK ) {
+            return;
+        }
+        
+        m_results = searchResult.ApiResponse.Data.ToList();
+        StateHasChanged();
+    }
     
     private void HandleEnterPressed(KeyboardEventArgs e) {
         if(e.Code == "Enter" || e.Key == "Enter") {

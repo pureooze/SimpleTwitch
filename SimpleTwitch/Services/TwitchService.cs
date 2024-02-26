@@ -54,6 +54,13 @@ public class TwitchService : ITwitchService {
         return m_restClient.GetChannelInfo( broadcasterId );
     }
     
+    Task<GetChannelSearchResponse> ITwitchService.SearchForChannel(
+        string query
+    ) {
+        InitializeRestClient();
+        return m_restClient.SearchForChannel( query, 6 );
+    }
+    
     Task<GetStreamsResponse> ITwitchService.GetLiveStreams(
         string[] logins
     ) {

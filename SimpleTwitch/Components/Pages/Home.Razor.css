@@ -14,4 +14,53 @@
 
 .initial-input-container {
     width: 50%;
+    position: relative;
+}
+
+.search-results {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1em;
+    background-color: var(--secondary-color);
+    float: inherit;
+    max-height: 16em;
+    overflow-y: auto;
+    width: 100%;
+    position: absolute;
+}
+
+.search-result {
+    display: flex;
+    flex-direction: row;
+    column-gap: 0.5em;
+    padding-top: 1em;
+    padding-left: 1em;
+    align-items: center;
+    text-decoration: none;
+}
+
+.search-results:last-child {
+    padding-bottom: 1em;
+}
+
+.search-result-thumbnail {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    margin-right: 0.5em;
+}
+
+.search-result-name {
+    font-size: 1em;
+    color: var(--font-color);
+}
+
+.search-result-live {
+    color: var(--font-color);
+    background-color: var(--live-accent-color);
+    padding: 0.2em 0.5em;
+    border-radius: 0.5em;
+    border: var(--dark-accent-color) 1px solid;
+    font-size: 0.7em;
+    font-weight: bolder;
 }

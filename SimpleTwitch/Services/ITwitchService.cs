@@ -19,6 +19,10 @@ public interface ITwitchService {
     Task<GetChannelInfoResponse> GetChannelInfo( 
         string broadcasterId
     );
+
+    Task<GetChannelSearchResponse> SearchForChannel(
+        string query
+    );
     
     Task<GetStreamsResponse> GetLiveStreams( 
         string[] logins
