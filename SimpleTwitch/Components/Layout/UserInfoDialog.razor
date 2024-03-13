@@ -1,4 +1,4 @@
-﻿@inject ITwitchService TwitchService
+﻿@inject TwitchService TwitchService
 @inject ResourceService ResourceService
 
 @using TwitchEverywhere.Core.Types.Messages.Interfaces
@@ -54,7 +54,7 @@
     
     private UserEntry m_user;
     private bool m_loading = true;
-    private ITwitchService m_service;
+    private TwitchService m_service;
     private Dictionary<string, GameInfo> m_globalBadges = new();
     private JsonSerializerOptions m_options = new() {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

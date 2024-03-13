@@ -3,10 +3,11 @@
 @using SimpleTwitch.Services
 @using TwitchEverywhere.Core.Types.RestApi.Wrappers
 @using System.Net
+@using SimpleTwitch.Observables
 @using TwitchEverywhere.Core.Types.RestApi.Channel
 
-@inject NavigationManager NavigationManager
-@inject ITwitchService TwitchService
+@inject TwitchService TwitchService
+@inject NavigationObservable NavigationObservable
 
 <div class="initial-search-page">
     <h1>Simple Twitch</h1>
@@ -74,7 +75,7 @@
     
     private void HandleEnterPressed(KeyboardEventArgs e) {
         if(e.Code == "Enter" || e.Key == "Enter") {
-            NavigationManager.NavigateTo( $"/stream/{m_input}" );
+            NavigationObservable.Notify($"/stream/{m_input}");
         }
     }
 }

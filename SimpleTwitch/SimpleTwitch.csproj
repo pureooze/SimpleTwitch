@@ -70,9 +70,9 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
         <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2277.86" />
         <PackageReference Include="System.Reactive" Version="6.0.0" />
-        <PackageReference Include="VodOnDemand.TwitchEverywhere.Core" Version="0.7.2" />
-        <PackageReference Include="VodOnDemand.TwitchEverywhere.Irc" Version="0.7.0" />
-        <PackageReference Include="VodOnDemand.TwitchEverywhere.Rest" Version="0.7.2" />
+        <PackageReference Include="VodOnDemand.TwitchEverywhere.Core" Version="0.8.0" />
+        <PackageReference Include="VodOnDemand.TwitchEverywhere.Irc" Version="0.8.0" />
+        <PackageReference Include="VodOnDemand.TwitchEverywhere.Rest" Version="0.8.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -82,6 +82,18 @@
     <ItemGroup>
       <Content Remove="Resources\Json\fav.json" />
       <EmbeddedResource Include="Resources\Json\fav.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="TwitchEverywhere.Core">
+        <HintPath>..\..\TwitchEverywhere\TwitchEverywhere.Irc\bin\Release\net8.0\TwitchEverywhere.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="TwitchEverywhere.Irc">
+        <HintPath>..\..\TwitchEverywhere\TwitchEverywhere.Irc\bin\Release\net8.0\TwitchEverywhere.Irc.dll</HintPath>
+      </Reference>
+      <Reference Include="TwitchEverywhere.Rest">
+        <HintPath>..\..\TwitchEverywhere\TwitchEverywhere.Rest\bin\Release\net8.0\TwitchEverywhere.Rest.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

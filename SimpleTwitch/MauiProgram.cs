@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SimpleTwitch.Observables;
 using SimpleTwitch.Services;
 
 namespace SimpleTwitch {
@@ -20,8 +21,11 @@ namespace SimpleTwitch {
             builder.Configuration.AddJsonFile( "appsettings.json", true, true );
             builder.Configuration.AddJsonFile( "twitch.json", true, true );
 
-            builder.Services.AddSingleton<ITwitchService , TwitchService>();
-            builder.Services.AddSingleton<ResourceService , ResourceService>();
+            builder.Services.AddSingleton<TwitchService, TwitchService>();
+            builder.Services.AddSingleton<ResourceService, ResourceService>();
+            builder.Services.AddSingleton<NavigationService, NavigationService>();
+            builder.Services.AddSingleton<NavigationObservable, NavigationObservable>();
+            // builder.Services.AddSingleton<ChatMsgObservable, ChatMsgObservable>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
