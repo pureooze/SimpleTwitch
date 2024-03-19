@@ -84,16 +84,4 @@
       <EmbeddedResource Include="Resources\Json\fav.json" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="TwitchEverywhere.Core">
-        <HintPath>..\..\TwitchEverywhere\TwitchEverywhere.Irc\bin\Release\net8.0\TwitchEverywhere.Core.dll</HintPath>
-      </Reference>
-      <Reference Include="TwitchEverywhere.Irc">
-        <HintPath>..\..\TwitchEverywhere\TwitchEverywhere.Irc\bin\Release\net8.0\TwitchEverywhere.Irc.dll</HintPath>
-      </Reference>
-      <Reference Include="TwitchEverywhere.Rest">
-        <HintPath>..\..\TwitchEverywhere\TwitchEverywhere.Rest\bin\Release\net8.0\TwitchEverywhere.Rest.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>
