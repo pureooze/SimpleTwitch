@@ -11,10 +11,12 @@ namespace SimpleTwitch.Services;
 
 internal class TwitchService {
     private readonly IConfiguration m_configuration;
+    private readonly List<IObserver<IPrivMsg>> m_privMsgObservers = [];
+    private readonly List<IObserver<IJoinMsg>> m_joinMsgObservers = [];
     private IrcClient? m_ircClient;
     private RestClient? m_restClient;
     private IrcClientObservable? m_ircObservable;
-    
+
     public TwitchService( IConfiguration configuration ) {
         m_configuration = configuration;
         
@@ -42,13 +44,33 @@ internal class TwitchService {
     }
     
     public void SubscribeToPrivMsg( 
-        Action<IPrivMsg> callback 
+        IObserver<IPrivMsg> observer 
     ) {
         if (m_ircObservable == null) {
             throw new InvalidOperationException( "IRC client is not connected to a channel" );
         }
         
-        m_ircObservable.PrivMsgObservable.Subscribe( callback );
+        if (m_privMsgObservers.Contains( observer )) {
+            return;
+        }
+
+        m_privMsgObservers.Add(observer);
+        m_ircObservable.PrivMsgObservable.Subscribe( observer );
+    }
+    
+    public void SubscribeToJoinMsg( 
+        IObserver<IJoinMsg> observer 
+    ) {
+        if (m_ircObservable == null) {
+            throw new InvalidOperationException( "IRC client is not connected to a channel" );
+        }
+        
+        if (m_joinMsgObservers.Contains( observer )) {
+            return;
+        }
+
+        m_joinMsgObservers.Add(observer);
+        m_ircObservable.JoinObservable.Subscribe( observer );
     }
 
     public Task<GetUsersResponse> GetUsers(

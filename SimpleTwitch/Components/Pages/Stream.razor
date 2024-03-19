@@ -82,6 +82,7 @@
                         @foreach (IPrivMsg message in m_messages) {
                             <ChatMessage Message="@message" OnChildActionWithData="ParentMethodWithData"></ChatMessage>
                         }
+                        <span>@m_joiner</span>
                     </div>
                 </div>
                 <div class="chat-input-container">
@@ -114,8 +115,10 @@
     private IPrivMsg m_userInfoTarget;
     private ChannelInfoEntry m_channelInfo;
     private IObserver<IPrivMsg> _msgObserver;
+    private IObserver<IJoinMsg> _joinObserver;
     private IrcClientObservable IrcObservable;
-    
+    private string m_joiner;
+
     protected override async Task OnInitializedAsync() {
         m_batchSize = Configuration.GetValue<int>( "Settings:BufferSize" );
         m_service = TwitchService;
@@ -125,7 +128,10 @@
             onNext: MessageCallback
         );
         
-        await HandleChannelChange();
+        _joinObserver = Observer.Create<IJoinMsg>(
+            onNext: JoinCallback
+        );
+        
     }
 
     protected override async Task OnParametersSetAsync() {
@@ -143,6 +149,17 @@
         }
 
         m_messages.Enqueue( (PrivMsg)message );
+        StateHasChanged();
+    }
+    
+    private void JoinCallback(
+        IJoinMsg joinMessage
+    ) {
+        if( m_messages.Count > m_batchSize ) {
+            m_messages.Dequeue();
+        }
+
+        m_joiner = joinMessage.User;
         StateHasChanged();
     }
     
@@ -183,7 +200,8 @@
         
         m_isLoading = false;
         await TwitchService.ConnectToIrcChannel( Channel.ToLower() );
-        TwitchService.SubscribeToPrivMsg(callback: MessageCallback);
+        TwitchService.SubscribeToPrivMsg(_msgObserver);
+        TwitchService.SubscribeToJoinMsg(_joinObserver);
         StateHasChanged();
     }
 }
