@@ -25,7 +25,6 @@ namespace SimpleTwitch {
             builder.Services.AddSingleton<ResourceService, ResourceService>();
             builder.Services.AddSingleton<NavigationService, NavigationService>();
             builder.Services.AddSingleton<NavigationObservable, NavigationObservable>();
-            // builder.Services.AddSingleton<ChatMsgObservable, ChatMsgObservable>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
