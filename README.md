@@ -1,1 +1,3 @@
 # SimpleTwitch
+
+![SimpleTwitch](./SimpleTwitch.PNG)
